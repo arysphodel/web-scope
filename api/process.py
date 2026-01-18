@@ -8,8 +8,9 @@ class handler(BaseHTTPRequestHandler):
     Vercel Serverless Function for Digital Signal Processing
     
     Performs:
-    - Butterworth filtering (low-pass, high-pass)
+    - Butterworth filtering (low-pass, high-pass, band-pass)
     - Windowing functions (Hamming, Hanning, Blackman)
+    - Variable filter orders (2nd, 4th, 6th, 8th)
     - Returns filtered signal data
     """
     
@@ -32,6 +33,7 @@ class handler(BaseHTTPRequestHandler):
             samples = np.array(data.get('samples', []))
             sample_rate = data.get('sampleRate', 44100)
             cutoff_freq = data.get('cutoffFreq', 1000)
+            cutoff_freq2 = data.get('cutoffFreq2', 5000)  # For band-pass
             filter_type = data.get('filterType', 'lowpass')
             window_type = data.get('windowType', 'none')
             filter_order = data.get('filterOrder', 2)
@@ -47,7 +49,8 @@ class handler(BaseHTTPRequestHandler):
             # Design and apply Butterworth filter
             filtered_samples = apply_butterworth_filter(
                 samples, 
-                cutoff_freq, 
+                cutoff_freq,
+                cutoff_freq2,
                 sample_rate, 
                 filter_type,
                 filter_order
@@ -60,6 +63,7 @@ class handler(BaseHTTPRequestHandler):
                 'metadata': {
                     'sampleRate': sample_rate,
                     'cutoffFreq': cutoff_freq,
+                    'cutoffFreq2': cutoff_freq2,
                     'filterType': filter_type,
                     'windowType': window_type,
                     'filterOrder': filter_order,
@@ -108,33 +112,46 @@ def apply_window(samples, window_type):
     return samples * window
 
 
-def apply_butterworth_filter(samples, cutoff, fs, btype='lowpass', order=2):
+def apply_butterworth_filter(samples, cutoff, cutoff2, fs, btype='lowpass', order=2):
     """
-    Apply Butterworth digital filter
+    Apply Butterworth digital filter with support for band-pass
     
     Transfer Function (analog):
     H(s) = ωc^N / (s^N + b_(N-1)*s^(N-1) + ... + b_1*s + ωc^N)
     
     Parameters:
-    - cutoff: Cutoff frequency in Hz
+    - cutoff: Low cutoff frequency (Hz) for lowpass/highpass, or lower bound for bandpass
+    - cutoff2: High cutoff frequency (Hz) for bandpass
     - fs: Sampling frequency in Hz
-    - btype: 'lowpass' or 'highpass'
-    - order: Filter order (2 = second-order, smoother rolloff with higher orders)
+    - btype: 'lowpass', 'highpass', or 'bandpass'
+    - order: Filter order (2, 4, 6, 8)
     
     Returns:
     - Filtered signal
     """
-    # Normalize cutoff frequency (0 to 1, where 1 is Nyquist)
     nyquist = fs / 2
-    normalized_cutoff = cutoff / nyquist
     
-    # Ensure cutoff is valid
-    if normalized_cutoff <= 0 or normalized_cutoff >= 1:
-        raise ValueError(f"Cutoff frequency must be between 0 and {nyquist} Hz")
-    
-    # Design Butterworth filter
-    # Returns numerator (b) and denominator (a) coefficients
-    b, a = signal.butter(order, normalized_cutoff, btype=btype, analog=False)
+    if btype == 'bandpass':
+        # Band-pass filter: requires two cutoff frequencies
+        normalized_low = cutoff / nyquist
+        normalized_high = cutoff2 / nyquist
+        
+        # Validate cutoffs
+        if normalized_low <= 0 or normalized_high >= 1 or normalized_low >= normalized_high:
+            raise ValueError(f"Bandpass cutoffs must satisfy: 0 < fc1 < fc2 < {nyquist} Hz")
+        
+        # Design bandpass filter
+        b, a = signal.butter(order, [normalized_low, normalized_high], btype='bandpass', analog=False)
+    else:
+        # Lowpass or Highpass filter
+        normalized_cutoff = cutoff / nyquist
+        
+        # Ensure cutoff is valid
+        if normalized_cutoff <= 0 or normalized_cutoff >= 1:
+            raise ValueError(f"Cutoff frequency must be between 0 and {nyquist} Hz")
+        
+        # Design filter
+        b, a = signal.butter(order, normalized_cutoff, btype=btype, analog=False)
     
     # Apply filter using direct form II transposed structure
     # This is more numerically stable than direct convolution

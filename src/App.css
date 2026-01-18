@@ -21,7 +21,7 @@ body {
 /* Header */
 .header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
 }
 
 .header h1 {
@@ -31,23 +31,24 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .subtitle {
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: #b0b0b0;
   font-weight: 300;
 }
 
 .info {
   display: flex;
-  gap: 30px;
+  gap: 20px;
   justify-content: center;
-  margin-top: 15px;
-  font-size: 0.9rem;
+  margin-top: 12px;
+  font-size: 0.85rem;
   color: #00ffaa;
   flex-wrap: wrap;
+  font-family: 'Courier New', monospace;
 }
 
 /* Main Content */
@@ -55,8 +56,8 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  max-width: 1600px;
+  gap: 18px;
+  max-width: 1800px;
   width: 100%;
   margin: 0 auto;
 }
@@ -66,7 +67,7 @@ body {
   display: flex;
   align-items: center;
   gap: 20px;
-  padding: 20px;
+  padding: 18px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -127,44 +128,53 @@ body {
 }
 
 @keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 /* Filter Controls */
 .filter-controls {
-  padding: 20px;
+  padding: 18px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   border: 1px solid rgba(255, 100, 255, 0.3);
 }
 
 .control-header {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .control-header h3 {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   color: #ff64ff;
 }
 
+.control-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
 .control-group {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .control-group label {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  font-size: 0.9rem;
+  gap: 8px;
+  font-size: 0.88rem;
   color: #ccc;
+}
+
+.control-group label svg {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 5px;
 }
 
 .toggle-label {
@@ -185,7 +195,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
   color: white;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   cursor: pointer;
 }
 
@@ -224,24 +234,29 @@ body {
 .range-labels {
   display: flex;
   justify-content: space-between;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #888;
-  margin-top: 5px;
+  margin-top: 4px;
 }
 
 .filter-info {
-  margin-top: 20px;
-  padding: 15px;
+  margin-top: 15px;
+  padding: 12px;
   background: rgba(0, 0, 0, 0.3);
   border-radius: 6px;
   border-left: 3px solid #ff64ff;
 }
 
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
 .info-item {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
 }
 
 .info-item .label {
@@ -253,47 +268,76 @@ body {
   font-weight: 600;
 }
 
-/* Visualizers Container */
-.visualizers {
+/* Visualizers Grid */
+.visualizers-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 18px;
   flex: 1;
-  min-height: 600px;
+  min-height: 700px;
 }
 
-/* Oscilloscope & Spectrum */
+/* Individual Visualizers */
 .oscilloscope,
-.spectrum {
+.spectrum,
+.spectrogram,
+.filter-response {
   position: relative;
-  min-height: 300px;
+  min-height: 280px;
   background: rgba(20, 20, 30, 0.8);
   border-radius: 12px;
-  border: 2px solid rgba(0, 255, 170, 0.3);
   padding: 15px;
   overflow: hidden;
 }
 
+.oscilloscope {
+  border: 2px solid rgba(0, 255, 170, 0.3);
+}
+
 .spectrum {
-  border-color: rgba(0, 212, 255, 0.3);
+  border: 2px solid rgba(0, 212, 255, 0.3);
+}
+
+.spectrogram {
+  border: 2px solid rgba(255, 200, 0, 0.3);
+}
+
+.filter-response {
+  border: 2px solid rgba(255, 100, 255, 0.3);
 }
 
 .scope-label {
   position: absolute;
-  top: 20px;
-  left: 20px;
-  font-size: 0.9rem;
-  color: #00ffaa;
+  top: 15px;
+  left: 15px;
+  font-size: 0.82rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
   z-index: 10;
-  background: rgba(20, 20, 30, 0.7);
+  background: rgba(20, 20, 30, 0.8);
   padding: 5px 10px;
   border-radius: 4px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+}
+
+.oscilloscope .scope-label {
+  color: #00ffaa;
+}
+
+.spectrum .scope-label {
+  color: #00d4ff;
+}
+
+.spectrogram .scope-label {
+  color: #ffc800;
+}
+
+.filter-response .scope-label {
+  color: #ff64ff;
 }
 
 .badge {
@@ -301,12 +345,8 @@ body {
   color: white;
   padding: 2px 8px;
   border-radius: 4px;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 700;
-}
-
-.spectrum .scope-label {
-  color: #00d4ff;
 }
 
 .scope-canvas {
@@ -330,29 +370,80 @@ body {
 
 .overlay p {
   color: #b0b0b0;
-  font-size: 1.1rem;
+  font-size: 1rem;
+}
+
+/* Spectrogram Color Scale */
+.color-scale {
+  position: absolute;
+  bottom: 35px;
+  left: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  z-index: 10;
+}
+
+.scale-label {
+  color: #ffc800;
+  font-weight: 600;
+}
+
+.gradient-bar {
+  width: 150px;
+  height: 15px;
+  background: linear-gradient(to right, 
+    rgb(0, 0, 50),
+    rgb(0, 100, 200),
+    rgb(100, 200, 200),
+    rgb(255, 255, 100),
+    rgb(255, 100, 100)
+  );
+  border-radius: 3px;
+  border: 1px solid rgba(255, 200, 0, 0.3);
+}
+
+.scale-markers {
+  display: flex;
+  justify-content: space-between;
+  width: 150px;
+  font-size: 0.7rem;
+  color: #999;
 }
 
 /* Footer */
 .footer {
   text-align: center;
-  margin-top: 30px;
-  padding: 20px;
+  margin-top: 25px;
+  padding: 18px;
   color: #777;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 /* Responsive */
-@media (min-width: 1200px) {
-  .visualizers {
-    grid-template-columns: 1fr 1fr;
-    min-height: 500px;
+@media (max-width: 1400px) {
+  .visualizers-grid {
+    grid-template-columns: 1fr;
+    min-height: 1200px;
+  }
+
+  .control-row {
+    grid-template-columns: 1fr;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 768px) {
   .header h1 {
     font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
   }
   
   .controls {
@@ -367,15 +458,13 @@ body {
   
   .info {
     flex-direction: column;
-    gap: 10px;
-  }
-
-  .visualizers {
-    min-height: 700px;
+    gap: 8px;
   }
 
   .oscilloscope,
-  .spectrum {
+  .spectrum,
+  .spectrogram,
+  .filter-response {
     min-height: 250px;
   }
 }

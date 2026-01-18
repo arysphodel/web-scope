@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import Oscilloscope from './components/Oscilloscope';
 import SpectrumAnalyzer from './components/SpectrumAnalyzer';
+import Spectrogram from './components/Spectrogram';
+import FilterResponse from './components/FilterResponse';
 import Controls from './components/Controls';
 import FilterControls from './components/FilterControls';
 import './App.css';
@@ -14,8 +16,10 @@ function App() {
   // Filter settings
   const [filterEnabled, setFilterEnabled] = useState(false);
   const [cutoffFreq, setCutoffFreq] = useState(1000);
+  const [cutoffFreq2, setCutoffFreq2] = useState(5000); // For band-pass
   const [filterType, setFilterType] = useState('lowpass');
   const [windowType, setWindowType] = useState('none');
+  const [filterOrder, setFilterOrder] = useState(2);
   
   // For storing filtered data
   const [filteredData, setFilteredData] = useState(null);
@@ -46,6 +50,7 @@ function App() {
       setIsRunning(true);
 
       console.log(`Audio Context Started - Sample Rate: ${ctx.sampleRate} Hz`);
+      console.log(`FFT Size: ${analyserNode.fftSize}, Bins: ${analyserNode.frequencyBinCount}`);
     } catch (error) {
       console.error('Microphone access denied:', error);
       alert('Please allow microphone access to use the oscilloscope');
@@ -97,9 +102,10 @@ function App() {
             samples: samples,
             sampleRate: sampleRate,
             cutoffFreq: cutoffFreq,
+            cutoffFreq2: cutoffFreq2,
             filterType: filterType,
             windowType: windowType,
-            filterOrder: 2
+            filterOrder: filterOrder
           })
         });
 
@@ -124,18 +130,19 @@ function App() {
         clearInterval(processingIntervalRef.current);
       }
     };
-  }, [filterEnabled, analyser, isRunning, cutoffFreq, filterType, windowType, sampleRate]);
+  }, [filterEnabled, analyser, isRunning, cutoffFreq, cutoffFreq2, filterType, windowType, filterOrder, sampleRate]);
 
   return (
     <div className="app">
       <header className="header">
         <h1>Web-Scope</h1>
-        <p className="subtitle">Real-Time Digital Signal Visualizer with Backend DSP</p>
+        <p className="subtitle">Real-Time Digital Signal Visualizer • Advanced DSP Suite</p>
         {sampleRate > 0 && (
           <div className="info">
-            <span>Sample Rate (fs): {sampleRate} Hz</span>
-            <span>Nyquist Frequency (fN): {sampleRate / 2} Hz</span>
-            <span>FFT Resolution: {(sampleRate / 2048).toFixed(2)} Hz/bin</span>
+            <span>fs = {sampleRate} Hz</span>
+            <span>fN = {sampleRate / 2} Hz</span>
+            <span>Δf = {(sampleRate / 2048).toFixed(2)} Hz/bin</span>
+            <span>FFT: {2048} samples</span>
           </div>
         )}
       </header>
@@ -152,14 +159,18 @@ function App() {
           setFilterEnabled={setFilterEnabled}
           cutoffFreq={cutoffFreq}
           setCutoffFreq={setCutoffFreq}
+          cutoffFreq2={cutoffFreq2}
+          setCutoffFreq2={setCutoffFreq2}
           filterType={filterType}
           setFilterType={setFilterType}
           windowType={windowType}
           setWindowType={setWindowType}
+          filterOrder={filterOrder}
+          setFilterOrder={setFilterOrder}
           sampleRate={sampleRate}
         />
         
-        <div className="visualizers">
+        <div className="visualizers-grid">
           <Oscilloscope 
             analyser={analyser}
             isRunning={isRunning}
@@ -172,11 +183,26 @@ function App() {
             isRunning={isRunning}
             sampleRate={sampleRate}
           />
+          
+          <Spectrogram 
+            analyser={analyser}
+            isRunning={isRunning}
+            sampleRate={sampleRate}
+          />
+          
+          <FilterResponse 
+            filterEnabled={filterEnabled}
+            filterType={filterType}
+            cutoffFreq={cutoffFreq}
+            cutoffFreq2={cutoffFreq2}
+            filterOrder={filterOrder}
+            sampleRate={sampleRate}
+          />
         </div>
       </main>
 
       <footer className="footer">
-        <p>EE Project by [Your Name] | Butterworth Filtering • FFT Analysis • Windowing Functions</p>
+        <p>EE Project by [Your Name] • Time-Frequency Analysis • Butterworth Filtering • STFT • Bode Plots</p>
       </footer>
     </div>
   );
